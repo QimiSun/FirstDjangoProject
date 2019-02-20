@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, user-scalable=0, minimal-ui">
+    <title>awehome团队操作界面</title>
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+    <style>
+        #all_url {
+            resize: none;
+            width: 550px;
+        }
+
+        @media screen and (max-width: 500px) {
+            #all_url {
+                width: 340px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="panel panel-info" style="background-color: #f8f8f8">
+    <div class="panel-heading">
+        <h3 class="panel-title">亿忆网到Awehome自动发帖--------请完善发布前的必填信息</h3>
+    </div>
+    <div class="panel-body">
+
+        <div>登录Awehome区号:
+            <select class="form-control" name="quhao" id="quhao" style="width: 200px">
+                <option value="86">86</option>
+                <option value="61">61</option>
+                <option value="44">44</option>
+            </select>
+        </div>
+
+        <div>选择城市:
+            <select class="form-control" name="citys" id="citys" style="width: 200px">
+                <option value="悉尼">悉尼</option>
+                <option value="墨尔本">墨尔本</option>
+                <option value="布里斯班">布里斯班</option>
+                <option value="阿德莱德">阿德莱德</option>
+                <option value="堪培拉">堪培拉</option>
+            </select>
+        </div>
+
+
+        <div>登录Awehome的学居代表账号:
+            <input type="text" name="username" id="username" class="form-control" style="width: 200px">
+        </div>
+
+        <div>登录Awehome的学居代表密码:
+            <input type="password" name="password" id="password" class="form-control" style="width: 200px">
+        </div>
+
+
+        <div>需要发布的房源链接(可多条,一条url独占一行):
+            <textarea rows="10" class="form-control" cols="150" name="urls"
+                      id="all_url"></textarea>
+        </div>
+
+        <div>
+            <button class="btn btn-success" id="q1" style="margin-top: 10px">开始发布</button>
+            <img src="../static/imgs/loading.gif" alt="" id="loading" style="padding-top: 9px;display: none">
+            <span id="result" style="display: none;color: red">恭喜您,所有房源已经发布完毕</span>
+        </div>
+
+    </div>
+</div>
+
+<div id="log">
+
+</div>
+
+
+<script src="../static/jquery-3.3.1.min.js"></script>
+<script src="../static/bootstrap.min.js"></script>
+<script>
+    $("#q1").click(function () {
+            var urls = $("#all_url").val();
+            var detail_url = urls.split("\n");
+            var quhao = $("#quhao").val();
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var city = $("#citys").val();
+            if (urls === "") {
+                $("#log").append("<p style='color:red'>很抱歉,url不能为空</p>");
+                return
+            }
+            if (username === "") {
+                $("#log").append("<p style='color:red'>很抱歉,用户名不能为空</p>");
+                return
+            }
+            if (password === "") {
+                $("#log").append("<p style='color:red'>很抱歉,密码不能为空</p>");
+                return
+            }
+            $("#loading").css("display", "inline");
+            $("#log").empty();
+            $("#result").css("display", "none");
+            for (var i = 0; i < detail_url.length; i++) {
+                $.ajax({
+                    url: "/yiyi/",
+                    type: "POST",
+                    data: {
+                        quhao: quhao,
+                        username: username,
+                        password: password,
+                        city: city,
+                        detail_url: detail_url[i],
+                    },
+                    success: function (success_data) {
+                        $("#log").append("<p>" + success_data + "</p>");
+                        var log_children_length = $("#log").children().length;
+                        if (log_children_length === detail_url.length) {
+                            $("#loading").css("display", "none");
+                            $("#result").css("display", "inline");
+                        }
+                    }
+                });
+            }
+        }
+    );
+
+    $("#all_url").click(function () {
+        $("#log").empty();
+        $("#result").css("display", "none");
+        $("#loading").css("display", "none");
+    })
+
+
+</script>
+</body>
+</html>
